@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator
+from django.core.serializers import serialize
 
 from .models import Stock
 import json
@@ -30,5 +31,12 @@ def SharePriceView(request):
 
 
 def ShareDetailView(request, sn: int):
-    object = Stock.objects.filter(sn=sn)[0]
-    return render(request, 'sharedetail.html', context={'object': object})
+    objects = Stock.objects.filter(sn=sn)
+    obj = objects[0]
+
+    for o in objects:
+        print(o)
+
+    ser_objects = serialize('json', objects)
+
+    return render(request, 'sharedetail.html', context={'object': obj, 'objects': ser_objects})

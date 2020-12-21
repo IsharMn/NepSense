@@ -2,6 +2,25 @@
     font-family: "Source Sans Pro", sans-serif;
 }
 
+.container{
+    margin-left: 10%;
+    margin-right: 10%;
+    background-color: white;
+}
+
+.title{
+    background-color: #8ac04b;
+    color: white;
+    font-weight: bold;
+    margin: 4px;
+}
+
+.title h1{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}
+
 /* Add a black background color to the top navigation */
 .topnav {
     background-color: #333;

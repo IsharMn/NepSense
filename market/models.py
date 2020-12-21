@@ -16,5 +16,5 @@ class Stock(models.Model):
     sn = models.IntegerField()
 
     def __str__(self):
-        return self.company
+        return str(self.company)
     

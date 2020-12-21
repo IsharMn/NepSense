@@ -1,7 +1,7 @@
 import json, datetime
 from psycopg2 import connect, Error
 
-LATEST_DATE = datetime.datetime()
+# LATEST_DATE = datetime.datetime()
 
 def main():
     try:
