@@ -52,6 +52,11 @@
                     <td>{{object.amount}}</td>
                 </tr>
             </table>
+            <form class="filter" method="get">
+                <label for="date">Date</label>
+                <input type="date" name="date">
+                <input type="submit" value="Filter">
+            </form>
         </div>
         <div class="chart-container">
             <canvas id="myChart" width="400" height="400"></canvas>

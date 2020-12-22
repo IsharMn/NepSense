@@ -1,9 +1,8 @@
 import json, datetime
 from psycopg2 import connect, Error
 
-# LATEST_DATE = datetime.datetime()
-
 def main():
+    global LATEST_DATE
     try:
         conn = connect(
             dbname = "nepsense",
@@ -44,10 +43,21 @@ def main():
         conn.commit()
         query = sql_string
     
-    LATEST_DATE = datetime.datetime.today()
+    LATEST_DATE = datetime.date.today()
+    with open('updated_date', 'w') as f:
+        f.write(str(LATEST_DATE))
     cur.close()
     conn.close()
 
-
 if __name__ == "__main__":
-    main()
+    update = datetime.time(hour=15)
+    while True:
+        today = datetime.datetime.now()
+        if today.weekday() in range(0, 5):
+            if today.time() > update:
+                main()
+                print("Database updated")
+            else:
+                print("Not time yet")
+        else:
+            print("Stock market closed today")

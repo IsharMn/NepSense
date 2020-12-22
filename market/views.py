@@ -11,18 +11,20 @@ import json
 #     model = Stock
 #     template_name = "shareprice.html"
 
+expected_date = None
+
 def SharePriceView(request):
     page = request.GET.get('page') or 1
     date = request.GET.get('date')
     company = request.GET.get('company')
-    rows = request.GET.get('rows') or 30
-    year, month, day = None, None, None
-    if date:
-        year, month, day = date.split('-')
-        objects = Stock.objects.filter(date_saved__year=year, date_saved__day=19, date_saved__month=month)
-    else:
-        day = 19
-        objects = Stock.objects.filter(date_saved__day=day)
+    rows = request.GET.get('rows') or 24
+    if not date:
+        with open('updated_date') as f:
+            date = f.readline().strip()
+    year, month, day = date.split('-')
+    global expected_date
+    expected_date = year, month, day
+    objects = Stock.objects.filter(date_saved__year=year, date_saved__day=day, date_saved__month=month)
     
     paginator = Paginator(objects, rows)
     page_obj = paginator.get_page(page)
@@ -32,11 +34,20 @@ def SharePriceView(request):
 
 def ShareDetailView(request, sn: int):
     objects = Stock.objects.filter(sn=sn)
-    obj = objects[0]
-
-    for o in objects:
-        print(o)
+    filtered_date = request.GET.get('date')
+    if filtered_date:
+        date = filtered_date.split('-')
+        if obj := Stock.objects.filter(date_saved__year=date[0], date_saved__month=date[1],
+                                    date_saved__day=date[2], sn=sn):
+            obj = obj[0]
+        
+    else:
+        if not expected_date:
+            obj = objects[0]
+        else:
+            date = expected_date
+            obj = Stock.objects.filter(date_saved__year=date[0], date_saved__month=date[1],
+                                            date_saved__day=date[2], sn=sn)[0]
 
     ser_objects = serialize('json', objects)
-
     return render(request, 'sharedetail.html', context={'object': obj, 'objects': ser_objects})
