@@ -1,4 +1,8 @@
-import json, datetime
+import json, datetime, os, sys
+
+sys.path.insert(1, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from nepsense.settings import BASE_DIR
 from psycopg2 import connect, Error
 
 def main():
@@ -18,7 +22,7 @@ def main():
         conn = None
         cur = None
 
-    with open('/home/isharm/go/github.com/IsharMhzn/nepse-scrapi/json/todaysprice.json', 'r') as f:
+    with open(os.path.join(BASE_DIR, 'json/todaysprice.json'), 'r') as f:
         share_price = json.load(f)
 
     table = 'market_stock'
@@ -44,20 +48,10 @@ def main():
         query = sql_string
     
     LATEST_DATE = datetime.date.today()
-    with open('updated_date', 'w') as f:
+    with open(os.path.join(BASE_DIR, 'updated_date'), 'w') as f:
         f.write(str(LATEST_DATE))
     cur.close()
     conn.close()
 
 if __name__ == "__main__":
-    update = datetime.time(hour=15)
-    while True:
-        today = datetime.datetime.now()
-        if today.weekday() in range(0, 5):
-            if today.time() > update:
-                main()
-                print("Database updated")
-            else:
-                print("Not time yet")
-        else:
-            print("Stock market closed today")
+    main()
