@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block link %} 
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block pagetitle %}
+Today's Share Price
+{% endblock %}
+
+{% block content %}
+    <div class="filter">
+        <form method="GET" action="{% url 'shareprice filter' %}">
+            <label for="company">Company</label>
+            <input type="text" name="company">
+            <label for="company">Date</label>
+            <input type="date" name="date">
+            <label for="rows">Rows</label>
+            <select name="rows">
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+            </select>
+            <input type="submit" value="Filter">
+        </form>
+    </div>
+
+    <div class="table-container">
+        <div class="table">
+            <div class="table-head">
+                <div class="table-cell">Company Name</div>
+                <div class="table-cell">Total transaction</div>
+                <div class="table-cell">Previous Closing Price</div>
+                <div class="table-cell">Closing Price</div>
+                <div class="table-cell">Difference</div>
+
+            </div>
+            {% for obj in page_obj %}
+                    <a class="table-row" href="{% url 'share detail' obj.sn %}">
+                        <div class="table-cell">{{obj.company}}</div>
+                        <div class="table-cell">{{obj.transno}}</div>
+                        <div class="table-cell">{{obj.prevclosep}}</div>
+                        <div class="table-cell">{{obj.closep}}</div>
+                        <div class="table-cell">{{obj.diff|floatformat}}
+                            <img src=""></img>
+                        </div>
+                    </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="pagination">
+        <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+            <span class="current">
+                {{i}}
+            </span>
+            {% else %}
+                <a href="?page={{i}}">{{i}}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+        </span>
+    </div>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

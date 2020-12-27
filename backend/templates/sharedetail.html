@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block link %}
+    <link href="{% static 'css/sharedetail.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+{% endblock %}
+
+{% block pagetitle %}
+    {{object}}
+{% endblock %}
+
+{% block content %}
+    <div class="info-container">
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th colspan=2>
+                    Data
+                    </th>
+                </tr>
+                <tr>
+                    <td>No. of transaction</td>
+                    <td>{{object.transno}}</td>
+                </tr>
+                <tr>
+                    <td>Max price</td>
+                    <td>{{object.maxp}}</td>
+                </tr>
+                <tr>
+                    <td>Min price</td>
+                    <td>{{object.minp}}</td>
+                </tr>
+                <tr>
+                    <td>Closing Price</td>
+                    <td>{{object.closep}}</td>
+                </tr>
+                <tr>
+                    <td>Previous Close P.</td>
+                    <td>{{object.prevclosep}}</td>
+                </tr>
+                <tr>
+                    <td>Difference</td>
+                    <td>{{object.diff}}</td>
+                </tr>
+                <tr>
+                    <td>Traded shares
+                    <td>{{object.tradedshares}}</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td>{{object.amount}}</td>
+                </tr>
+            </table>
+            <form class="filter" method="get">
+                <label for="date">Date</label>
+                <input type="date" name="date">
+                <input type="submit" value="Filter">
+            </form>
+        </div>
+        <div class="chart-container">
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var objects = JSON.parse("{{objects|escapejs}}");
+
+var values = [];
+var dates = []
+
+objects.forEach((element) =>{
+    values.push(element.fields.closep);
+    dates.push(element.fields.date_saved);
+})
+
+console.log(values)
+
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Closing prices',
+            data: values,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: false,
+    }
+});
+</script>
+    
+{% endblock %}

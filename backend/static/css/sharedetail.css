@@ -1,0 +1,42 @@
+.info-container{
+    display: flex;
+    justify-content: center;
+}
+
+.table-container table{
+    font-weight: bold;
+    font-size: larger;
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+    width: 500px;
+    height: 600px;
+    margin-top: 15px;
+}
+.table-container th{
+    background-color: #8ac04b;
+    color: white;
+}
+.table-container td{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+.table-container td:hover{
+    background-color: #73c2a1;
+    color: white;
+}
+
+.chart-container{
+    margin-top: 30px;
+    margin-left: 150px;
+}
+
+.chart-container canvas{
+    width: 600px;
+    height: 600px;
+}
+
+.filter{
+    margin-left: 25%;
+    margin-top: 2px;
+}
