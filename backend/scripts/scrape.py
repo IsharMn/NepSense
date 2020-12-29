@@ -3,9 +3,10 @@ import requests
 import datetime
 import json, sys, os
 
-sys.path.insert(1, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from nepsense.settings import BASE_DIR
+try:
+    sys.path.insert(1, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+finally:
+    from nepsense.settings import BASE_DIR
 
 def scrape(souplist, categories, count, max=None):
     container = []
@@ -45,8 +46,9 @@ def todaysprice():
         con, count = scrape(td, categories, count)
         container.extend(con)
         index += 1
-    
-    return container
+
+    with open(os.path.join(BASE_DIR, "json", "todaysprice.json"), 'w') as f:
+        json.dump(container, f)
 
 
 def liveprice():
@@ -62,22 +64,64 @@ def liveprice():
     print(container)
 
 def floorsheet():
-    pass
+    URL = "http://www.nepalstock.com/main/floorsheet/"
+
+    titles = ("Contract No.", "Symbol", "Buyer Broker", "Seller Broker"
+             ,"Quantity", "Rate", "Amount")
+    floorsheet = []
+
+    while True:
+        print(f"Visiting {URL}...")
+        response = requests.get(URL).text 
+        soup = BeautifulSoup(response, "html.parser")
+        rows = soup.find_all("tr")[2:-2]
+
+        for row in rows:
+            tds = row.find_all("td")[1:]
+            page = {}
+            for k, v in zip(titles, tds):
+                page[k] = v.text.strip()
+            
+            if page:
+                floorsheet.append(page)
+
+        next_p = soup.find("a", attrs={"title": "Next Page"})
+        print(f"Next URL...{next_p}")
+        if not next_p:
+            break
+        URL = next_p["href"]
+    
+    with open(os.path.join(BASE_DIR, "json", "floorsheet.json"), 'w') as f:
+        json.dump(floorsheet, f)
 
 
+def listcompany():
+    index = 1
+    companies = []
+    titles = "Name", "Symbol", "Sector"
 
-def main():
-    stock = todaysprice()
+    while index < 15:
+        URL = f"http://www.nepalstock.com/company/index/{index}"
+        response = requests.get(URL).text
+        soup = BeautifulSoup(response, 'html.parser')
+        rows = soup.find_all("tr")
+        t_rows = rows[2:]
 
-    with open(os.path.join(BASE_DIR, "json", "todaysprice.json"), 'w') as f:
-        json.dump(stock, f)
+        for r in t_rows:
+            tds = r.find_all("td")[2:5]
+            company = {}
+            for k, v in zip(titles, tds):
+                company[k] = v.text.strip()
+            
+            if company:
+                companies.append(company)
 
+        index += 1
+    
+    with open(os.path.join(BASE_DIR, "json", "companylist.json"), 'w') as f:
+        json.dump(companies, f)
 
 
 if __name__ == "__main__":
-    update = datetime.time(hour=15)
-    while True:
-        today = datetime.datetime.now()
-        if today.weekday() in range(0, 5) or [6]:
-            main()
-            break
+    # listcompany()
+    floorsheet()
